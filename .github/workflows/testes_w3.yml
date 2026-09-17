@@ -1,33 +1,75 @@
-name: Validacao de Governanca de Codigo 
-on: [push]
+name: Validacao de Governanca e Codigo
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
-  auditoria-git:
+  validacao:
     runs-on: ubuntu-latest
     steps:
-    - name: Clonar Repositorio Completo
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Clonar repositorio completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Testar Uso de Multiplas Branches
-      run: |
-        TOTAL_BRANCHES=$(git branch -r | wc -l)
-        if [ "$TOTAL_BRANCHES" -le 1 ]; then
-          echo "❌ REPROVADO: A célula trabalhou apenas na branch main. Uso de ramificações (branches) obrigatorio!"
-          exit 1
-        else
-          echo "✅ PASSOU: Ramificações identificadas no histórico."
-        fi
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Testar Sintaxe e Parâmetros JSON de SI
-      run: |
-        if [ ! -f docs/governanca_dados.json ]; then
-          echo "❌ REPROVADO: Arquivo docs/governanca_dados.json nao encontrado!"
-          exit 1
-        fi
-        if grep -q "compliance_lgpd" docs/governanca_dados.json; then
-          echo "✅ PASSOU: Estrutura de metadados de governança validada."
-        else
-          echo "❌ REPROVADO: Chave 'compliance_lgpd' obrigatoria ausente no manifesto."
-          exit 1
-        fi
+      - name: Verificar uso de multiplas branches
+        shell: bash
+        run: |
+          total_branches="$(git ls-remote --heads origin | wc -l | tr -d ' ')"
+          if [ "$total_branches" -le 1 ]; then
+            echo "Reprovado: nenhuma branch de trabalho foi encontrada."
+            exit 1
+          fi
+          echo "Branches de trabalho identificadas no repositorio."
+
+      - name: Validar Conventional Commits
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            intervalo="$BASE_SHA..$HEAD_SHA"
+          elif git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            intervalo="$BASE_SHA..$HEAD_SHA"
+          else
+            intervalo="$HEAD_SHA^..$HEAD_SHA"
+          fi
+
+          padrao='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._/-]+\))?!?: .+'
+          encontrou_commit=false
+          while IFS= read -r mensagem; do
+            [ -z "$mensagem" ] && continue
+            encontrou_commit=true
+            if [[ ! "$mensagem" =~ $padrao ]]; then
+              echo "Commit fora do padrao: $mensagem"
+              exit 1
+            fi
+          done < <(git log --no-merges --format=%s "$intervalo")
+
+          if [ "$encontrou_commit" = false ]; then
+            echo "Nenhum commit nao relacionado a merge para validar."
+          fi
+
+      - name: Verificar sintaxe Python
+        run: python -m compileall -q src tests
+
+      - name: Executar testes automatizados
+        run: python -m unittest discover -s tests -v
+
+      - name: Executar auditoria de rastreabilidade
+        run: >-
+          python src/rastreabilidade_si.py
+          --desde 1970-01-01
+          --ate 2100-12-31
+          --json

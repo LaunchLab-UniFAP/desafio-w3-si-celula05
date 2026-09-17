@@ -38,31 +38,116 @@ O uso de ferramentas de IA (como ChatGPT, GitHub Copilot ou Claude) no LaunchLab
 * A Auditoria Docente: O professor pode realizar inspeções e arguições orais surpresa. Se um aluno for questionado em sala e não souber explicar a arquitetura ou o funcionamento do código assinado por ele, a competência será marcada imediatamente como Não Desenvolvida (ND) para toda a célula, acionando o Contrato de Convivência.
 
 
-## 📑 4. Relatório de Entrega da Célula (Preenchimento Obrigatório)
+## ▶️ 4. Execução e validação
+
+O projeto utiliza somente a biblioteca padrão do **Python 3.9 ou superior** e
+não exige instalação de dependências externas.
+
+### Projeção epidemiológica
+
+O cálculo projeta um único ciclo pelo modelo multiplicativo:
+
+```text
+focos projetados = focos atuais × taxa de reprodução
+```
+
+As entradas precisam ser números reais, finitos e não negativos. Para executar
+o exemplo incluído no projeto:
+
+```bash
+python3 src/endemia.py
+```
+
+### Relatório de rastreabilidade
+
+Por padrão, o script audita os commits não relacionados a merge da semana atual:
+
+```bash
+python3 src/rastreabilidade_si.py
+```
+
+O período, repositório e tolerância podem ser informados explicitamente:
+
+```bash
+python3 src/rastreabilidade_si.py \
+  --desde 2026-09-14 \
+  --ate 2026-09-20 \
+  --tolerancia 1 \
+  --json
+```
+
+A isonomia considera a diferença entre as quantidades de commits por e-mail.
+Ela é apenas um indicador quantitativo: tamanho, complexidade e qualidade das
+contribuições também precisam ser avaliados na revisão humana.
+
+### Testes
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+O workflow executa a verificação de sintaxe, os testes e a auditoria em pushes
+e pull requests. As regras declaradas em `docs/governanca_dados.json` também
+devem ser configuradas na proteção da branch `main`; o manifesto não substitui
+as configurações do GitHub.
+
+## 📑 5. Relatório de Entrega da Célula (Preenchimento Obrigatório)
 Instrução: Edite as seções abaixo preenchendo as evidências críticas da dupla até o prazo limite estipulado no ciclo semanal.
 ## 📂 Identificação
 
-* Curso: [Sistemas de Informação / ADS]
-* Membro 1 (Nome & GitHub): @[Username] - [Nome Completo]
-* Membro 2 (Nome & GitHub): @[Username] - [Nome Completo]
-* Embaixador Vinculado: @[Username] - [Nome do Monitor]
+* Curso: Sistemas de Informação
+* Membro 1 (Nome & GitHub): @viniciuslacerd4 - Vinícius Lacerda Borges
+* Membro 2 (Nome & GitHub): @matheusbwv - Matheus Wenes
+* Embaixador Vinculado: @CaioTarso - Caio Tarso
 
 ## 🌍 Seção de Análise Crítica (Formação Geral)
 
 Com base no cenário proposto da semana, descreva qual o impacto humano, social, ético ou ambiental da tecnologia que sua célula colocou em produção. Como as decisões de código impactam o mundo físico e a vida do cidadão/empresa?
-💬 RESPOSTA DA CÉLULA: [Escreva sua análise crítica aqui]
+
+💬 RESPOSTA DA CÉLULA: A projeção de focos pode apoiar a vigilância
+epidemiológica na priorização de áreas, equipes e recursos. Por isso, um erro de
+cálculo ou a aceitação de entradas inválidas poderia superestimar ou subestimar
+o cenário e influenciar negativamente decisões que afetam a população. Para
+reduzir esse risco, limitamos a projeção a um ciclo bem definido, validamos
+valores negativos, não numéricos e não finitos e cobrimos esses casos com testes
+automatizados. Também declaramos no manifesto que dados identificáveis de
+pacientes não são permitidos e que informações epidemiológicas devem ser
+anonimizadas, pseudonimizadas ou agregadas. Reconhecemos que este cálculo é uma
+simplificação educacional e não deve ser usado isoladamente para orientar uma
+decisão de saúde pública.
 
 ## 💻 Seção de Engenharia e Governança de TI
 
 Justifique a decisão de arquitetura técnica adotada pela célula nesta entrega. Como as regras de negócio de ADS e as estruturas de dados de SI foram construidas para garantir que a solução seja escalável e de fácil manutenção?
-💬 RESPOSTA DA CÉLULA: [Escreva sua justificativa técnica aqui]
+
+💬 RESPOSTA DA CÉLULA: Organizamos a solução por responsabilidades. O arquivo
+`src/endemia.py` contém apenas a regra de projeção e a validação das entradas;
+`src/rastreabilidade_si.py` coleta o histórico Git e transforma os commits em
+um relatório estruturado; e `docs/governanca_dados.json` mantém as políticas de
+licença, LGPD e colaboração em formato legível por pessoas e por ferramentas.
+As funções possuem entradas e saídas claras, tratamento explícito de erros e
+dependem somente da biblioteca padrão do Python, o que reduz o acoplamento e
+facilita a execução em outros ambientes. Os testes automatizados verificam as
+regras de cálculo, rastreabilidade e governança, enquanto o GitHub Actions
+executa compilação, testes, auditoria e validação das mensagens de commit. Essa
+separação permite evoluir cada parte sem misturar a regra epidemiológica com a
+infraestrutura de auditoria.
 
 ## 🛠️ Diário de Bordo da Bancada
 
-* Maior travamento técnico superado pela dupla durante a semana: [Relate aqui]
-* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a célula: [Relate aqui]
+* Maior travamento técnico superado pela dupla durante a semana: integrar as
+  contribuições desenvolvidas separadamente e transformar o código inicial em
+  uma entrega executável. O histórico mostra primeiro a preparação do
+  repositório, depois a inclusão da governança e da rastreabilidade e, por fim,
+  a correção do erro de sintaxe no cálculo, a definição do modelo de um ciclo e
+  a inclusão dos testes. Também foi necessário fortalecer o workflow, pois a
+  versão inicial conseguia passar sem executar o código Python.
+* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a
+  célula: o embaixador Caio Tarso preparou o repositório, enviou os convites de
+  acesso e acompanhou a equipe, oferecendo suporte e orientação conforme as
+  dúvidas surgiram. Esse apoio permitiu organizar o fluxo de branches e commits
+  e manter os integrantes trabalhando no mesmo repositório.
 
 
 
 ## Lembrete de Fechamento: Garanta que todo o projeto esteja commitado na branch principal ('main') e responda ao Micro Simulado individual no AVA antes do prazo limite.
-
