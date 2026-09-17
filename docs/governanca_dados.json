@@ -1,16 +1,30 @@
-{ #Base para alunos de SI
-  
+{
+  "descricao": "Manifesto de governanca de dados epidemiologicos",
   "licenca_distribuicao": "MIT",
   "versao_manifesto": "1.0.0",
+  "detalhes_licenca_open_source": {
+    "tipo": "Permissiva",
+    "identificador_spdx": "MIT",
+    "uso_comercial_permitido": true,
+    "redistribuicao_permitida": true,
+    "obrigacao_principal": "Preservar o aviso de copyright e a licenca"
+  },
   "compliance_lgpd": {
     "anonimizacao_obrigatoria": true,
+    "dados_identificaveis_de_pacientes_permitidos": false,
+    "tecnicas_de_protecao": [
+      "Anonimizacao",
+      "Pseudonimizacao",
+      "Agregacao estatistica"
+    ],
     "politica_retencao_anos": 5,
-    "nivel_acesso_restrito": "Critico"
+    "descarte_seguro_apos_retencao": true,
+    "nivel_acesso_restrito": "Critico",
+    "revisao_periodica_meses": 12
   },
-  
   "regras_git": {
     "bloquear_push_main_direto": true,
-    "exigir_conventional_commits": true
+    "exigir_conventional_commits": true,
+    "exigir_revisao_por_pull_request": true
   }
-
 }
