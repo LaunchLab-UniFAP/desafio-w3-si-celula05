@@ -38,31 +38,83 @@ O uso de ferramentas de IA (como ChatGPT, GitHub Copilot ou Claude) no LaunchLab
 * A Auditoria Docente: O professor pode realizar inspeções e arguições orais surpresa. Se um aluno for questionado em sala e não souber explicar a arquitetura ou o funcionamento do código assinado por ele, a competência será marcada imediatamente como Não Desenvolvida (ND) para toda a célula, acionando o Contrato de Convivência.
 
 
-## 📑 4. Relatório de Entrega da Célula (Preenchimento Obrigatório)
+## ▶️ 4. Execução e validação
+
+O projeto utiliza somente a biblioteca padrão do **Python 3.9 ou superior** e
+não exige instalação de dependências externas.
+
+### Projeção epidemiológica
+
+O cálculo projeta um único ciclo pelo modelo multiplicativo:
+
+```text
+focos projetados = focos atuais × taxa de reprodução
+```
+
+As entradas precisam ser números reais, finitos e não negativos. Para executar
+o exemplo incluído no projeto:
+
+```bash
+python3 src/endemia.py
+```
+
+### Relatório de rastreabilidade
+
+Por padrão, o script audita os commits não relacionados a merge da semana atual:
+
+```bash
+python3 src/rastreabilidade_si.py
+```
+
+O período, repositório e tolerância podem ser informados explicitamente:
+
+```bash
+python3 src/rastreabilidade_si.py \
+  --desde 2026-09-14 \
+  --ate 2026-09-20 \
+  --tolerancia 1 \
+  --json
+```
+
+A isonomia considera a diferença entre as quantidades de commits por e-mail.
+Ela é apenas um indicador quantitativo: tamanho, complexidade e qualidade das
+contribuições também precisam ser avaliados na revisão humana.
+
+### Testes
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+O workflow executa a verificação de sintaxe, os testes e a auditoria em pushes
+e pull requests. As regras declaradas em `docs/governanca_dados.json` também
+devem ser configuradas na proteção da branch `main`; o manifesto não substitui
+as configurações do GitHub.
+
+## 📑 5. Relatório de Entrega da Célula (Preenchimento Obrigatório)
 Instrução: Edite as seções abaixo preenchendo as evidências críticas da dupla até o prazo limite estipulado no ciclo semanal.
 ## 📂 Identificação
 
-* Curso: [Sistemas de Informação / ADS]
-* Membro 1 (Nome & GitHub): @[Username] - [Nome Completo]
-* Membro 2 (Nome & GitHub): @[Username] - [Nome Completo]
-* Embaixador Vinculado: @[Username] - [Nome do Monitor]
+* Curso: Sistemas de Informação
+* Membro 1 (Nome & GitHub): @CaioTarso - Caio Tarso
+* Membro 2 (Nome & GitHub): @matheusbwv - Matheus Wenes
+* Embaixador Vinculado: **PENDENTE — preencher pela célula antes do merge**
 
 ## 🌍 Seção de Análise Crítica (Formação Geral)
 
 Com base no cenário proposto da semana, descreva qual o impacto humano, social, ético ou ambiental da tecnologia que sua célula colocou em produção. Como as decisões de código impactam o mundo físico e a vida do cidadão/empresa?
-💬 RESPOSTA DA CÉLULA: [Escreva sua análise crítica aqui]
+💬 RESPOSTA DA CÉLULA: **PENDENTE — redigir pela própria célula antes do merge.**
 
 ## 💻 Seção de Engenharia e Governança de TI
 
 Justifique a decisão de arquitetura técnica adotada pela célula nesta entrega. Como as regras de negócio de ADS e as estruturas de dados de SI foram construidas para garantir que a solução seja escalável e de fácil manutenção?
-💬 RESPOSTA DA CÉLULA: [Escreva sua justificativa técnica aqui]
+💬 RESPOSTA DA CÉLULA: **PENDENTE — redigir pela própria célula antes do merge.**
 
 ## 🛠️ Diário de Bordo da Bancada
 
-* Maior travamento técnico superado pela dupla durante a semana: [Relate aqui]
-* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a célula: [Relate aqui]
+* Maior travamento técnico superado pela dupla durante a semana: **PENDENTE — preencher pela célula antes do merge.**
+* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a célula: **PENDENTE — preencher pela célula antes do merge.**
 
 
 
 ## Lembrete de Fechamento: Garanta que todo o projeto esteja commitado na branch principal ('main') e responda ao Micro Simulado individual no AVA antes do prazo limite.
-
