@@ -31,6 +31,36 @@ jobs:
           fi
           echo "Branches de trabalho identificadas no repositorio."
 
+      - name: Validar Conventional Commits
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            intervalo="$BASE_SHA..$HEAD_SHA"
+          elif git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            intervalo="$BASE_SHA..$HEAD_SHA"
+          else
+            intervalo="$HEAD_SHA^..$HEAD_SHA"
+          fi
+
+          padrao='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._/-]+\))?!?: .+'
+          encontrou_commit=false
+          while IFS= read -r mensagem; do
+            [ -z "$mensagem" ] && continue
+            encontrou_commit=true
+            if [[ ! "$mensagem" =~ $padrao ]]; then
+              echo "Commit fora do padrao: $mensagem"
+              exit 1
+            fi
+          done < <(git log --no-merges --format=%s "$intervalo")
+
+          if [ "$encontrou_commit" = false ]; then
+            echo "Nenhum commit nao relacionado a merge para validar."
+          fi
+
       - name: Verificar sintaxe Python
         run: python -m compileall -q src tests
 
