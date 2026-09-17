@@ -1,0 +1,33 @@
+name: Validacao de Governanca de Codigo 
+on: [push]
+jobs:
+  auditoria-git:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clonar Repositorio Completo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Testar Uso de Multiplas Branches
+      run: |
+        TOTAL_BRANCHES=$(git branch -r | wc -l)
+        if [ "$TOTAL_BRANCHES" -le 1 ]; then
+          echo "❌ REPROVADO: A célula trabalhou apenas na branch main. Uso de ramificações (branches) obrigatorio!"
+          exit 1
+        else
+          echo "✅ PASSOU: Ramificações identificadas no histórico."
+        fi
+
+    - name: Testar Sintaxe e Parâmetros JSON de SI
+      run: |
+        if [ ! -f docs/governanca_dados.json ]; then
+          echo "❌ REPROVADO: Arquivo docs/governanca_dados.json nao encontrado!"
+          exit 1
+        fi
+        if grep -q "compliance_lgpd" docs/governanca_dados.json; then
+          echo "✅ PASSOU: Estrutura de metadados de governança validada."
+        else
+          echo "❌ REPROVADO: Chave 'compliance_lgpd' obrigatoria ausente no manifesto."
+          exit 1
+        fi

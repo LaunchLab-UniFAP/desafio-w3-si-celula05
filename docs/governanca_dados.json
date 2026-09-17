@@ -1,0 +1,16 @@
+{ #Base para alunos de SI
+  
+  "licenca_distribuicao": "MIT",
+  "versao_manifesto": "1.0.0",
+  "compliance_lgpd": {
+    "anonimizacao_obrigatoria": true,
+    "politica_retencao_anos": 5,
+    "nivel_acesso_restrito": "Critico"
+  },
+  
+  "regras_git": {
+    "bloquear_push_main_direto": true,
+    "exigir_conventional_commits": true
+  }
+
+}
